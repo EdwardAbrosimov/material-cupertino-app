@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           primarySwatch: Colors.deepOrange,
           visualDensity: VisualDensity.adaptivePlatformDensity),
-      home: const MyHomePage(title: 'Material App'),
+      home: const MyHomePage(title: 'Material demo'),
     );
   }
 }
@@ -29,12 +29,40 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  PersistentBottomSheetController? _controller;
+
+  void toggleBottomSheet() {
+    if (_controller == null) {
+      print('open bottomSheet');
+      _controller =
+          scaffoldKey.currentState?.showBottomSheet((context) => Container(
+                color: Colors.amber,
+                height: 150,
+                child: const Center(child: Text('TEST')),
+              ));
+    } else {
+      print('close bottomSheet');
+      _controller?.close();
+      _controller = null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
+          actions: [
+            Builder(
+                builder: ((context) => IconButton(
+                      onPressed: () => Scaffold.of(context).openEndDrawer(),
+                      icon: const Icon(Icons.account_circle_outlined),
+                      tooltip: MaterialLocalizations.of(context)
+                          .openAppDrawerTooltip,
+                    )))
+          ],
         ),
         drawer: Drawer(
           backgroundColor: Colors.white,
@@ -43,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.deepOrange,
+                backgroundImage: NetworkImage('https://picsum.photos/200'),
               ),
             ),
             const ListTile(
@@ -78,6 +107,22 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           ]),
         ),
+        endDrawer: Drawer(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.deepOrange,
+                  backgroundImage: NetworkImage('https://picsum.photos/200'),
+                ),
+                SizedBox(height: 10),
+                Text('Username')
+              ],
+            ),
+          ),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -88,6 +133,34 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
+        bottomNavigationBar: BottomAppBar(
+            shape: const CircularNotchedRectangle(),
+            elevation: 10,
+            notchMargin: 5,
+            clipBehavior: Clip.antiAlias,
+            child: Container(
+              child: BottomNavigationBar(
+                elevation: 0,
+                items: const [
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.account_circle_outlined),
+                      label: 'Profile'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.image_outlined), label: 'Images'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.folder_outlined), label: 'Files')
+                ],
+              ),
+            )),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.currency_ruble_outlined),
+          onPressed: toggleBottomSheet,
+        ),
+        // bottomSheet: BottomSheet(
+        //   builder: (context) => Container(height: 150, child: Center()),
+        //   onClosing: () {},
+        // ),
       ),
     );
   }
