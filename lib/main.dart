@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -29,25 +30,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  PersistentBottomSheetController? _controller;
-
-  void toggleBottomSheet() {
-    if (_controller == null) {
-      print('open bottomSheet');
-      _controller =
-          scaffoldKey.currentState?.showBottomSheet((context) => Container(
-                color: Colors.amber,
-                height: 150,
-                child: const Center(child: Text('TEST')),
-              ));
-    } else {
-      print('close bottomSheet');
-      _controller?.close();
-      _controller = null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -138,29 +120,47 @@ class _MyHomePageState extends State<MyHomePage> {
             elevation: 10,
             notchMargin: 5,
             clipBehavior: Clip.antiAlias,
-            child: Container(
-              child: BottomNavigationBar(
-                elevation: 0,
-                items: const [
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.account_circle_outlined),
-                      label: 'Profile'),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.image_outlined), label: 'Images'),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.folder_outlined), label: 'Files')
-                ],
-              ),
+            child: BottomNavigationBar(
+              elevation: 0,
+              items: const [
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.account_circle_outlined),
+                    label: 'Profile'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.image_outlined), label: 'Images'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.folder_outlined), label: 'Files')
+              ],
             )),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.currency_ruble_outlined),
-          onPressed: toggleBottomSheet,
+          onPressed: () {
+            showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    height: 140,
+                    color: Colors.white10,
+                    child: Center(
+                        child: Column(
+                      children: [
+                        ListTile(
+                          leading:
+                              const Icon(Icons.account_balance_wallet_outlined),
+                          title: const Text('Аmount'),
+                          trailing: Text(
+                              (Random().nextInt(100) + 1).toString() + ' ₽'),
+                        ),
+                        ElevatedButton(
+                            child: const Text('Pay'),
+                            onPressed: () => Navigator.pop(context))
+                      ],
+                    )),
+                  );
+                });
+          },
         ),
-        // bottomSheet: BottomSheet(
-        //   builder: (context) => Container(height: 150, child: Center()),
-        //   onClosing: () {},
-        // ),
       ),
     );
   }
